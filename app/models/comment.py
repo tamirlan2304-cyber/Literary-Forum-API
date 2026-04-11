@@ -22,8 +22,8 @@ class CommentORM(Base):
         ForeignKey("users.id", ondelete="CASCADE"),
     )
     content: Mapped[str] = mapped_column(Text)
-    likes_count: Mapped[int] = mapped_column(Integer)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.func.now)
+    likes_count: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
     post: Mapped["PostORM"] = relationship(back_populates="comments")

@@ -18,7 +18,7 @@ async def get_post_by_id(db: AsyncSession, post_id: uuid.UUID) -> PostORM:
             selectinload(PostORM.comments)
         )
     )
-    return result.scalar().first()
+    return result.scalars().first()
 
 
 async def get_posts(db: AsyncSession, page: int = 1, size: int = 20, tag: str | None = None) -> tuple[list[PostORM], int]:
@@ -40,7 +40,7 @@ async def get_posts(db: AsyncSession, page: int = 1, size: int = 20, tag: str | 
         .offset((page-1) * size)
         .limit(size)
     )
-    posts = result.scalars.all()
+    posts = result.scalars().all()
     return posts, total
 
 
@@ -83,7 +83,7 @@ async def update_post(db: AsyncSession, post: PostORM, update_data: PostUpdate) 
     update_dict = update_data.model_dump(exclude_unset=True)
 
     if "tag_names" in update_dict:
-        post.tags = await _get_or_create_tags(db, update_dict.pop["tag_names"])
+        post.tags = await _get_or_create_tags(db, update_dict.pop("tag_names"))
 
     for field, value in update_dict.items():
         setattr(post, field, value)

@@ -12,19 +12,19 @@ async def get_user_by_id(db: AsyncSession, user_id: uuid.UUID) -> UserORM | None
     result = await db.execute(
         select(UserORM).where(UserORM.id == user_id)
     )
-    return result.scalar().first()
+    return result.scalars().first()
 
 async def get_user_by_email(db: AsyncSession, email: str) -> UserORM | None:
     result = await db.execute(
         select(UserORM).where(UserORM.email == email)
     )
-    return result.scalar().first()
+    return result.scalars().first()
 
 async def get_user_by_username(db: AsyncSession, username: str) -> UserORM | None:
     result = await db.execute(
         select(UserORM).where(UserORM.username == username)
     )
-    return result.scalar().first()
+    return result.scalars().first()
 
 async def create_user(db: AsyncSession, user_data: UserCreate) -> UserORM:
     user = UserORM(
@@ -43,7 +43,7 @@ async def authenticate_user(db: AsyncSession, email: str, password : str) -> Use
     user = await get_user_by_email(db, email)
     if not user:
         return None
-    if not verify_password:
+    if not verify_password(password, user.hashed_password):
         return None
     return user
 

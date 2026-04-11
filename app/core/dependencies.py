@@ -31,7 +31,7 @@ async def get_redis() -> AsyncGenerator[aioredis.Redis, None]:
     try:
         yield client
     finally:
-        client.aclose()
+        await client.aclose()
 
 
 async def get_current_user(

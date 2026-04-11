@@ -15,7 +15,7 @@ class UserCreate(UserBase):
     @classmethod
     def password_len(cls, v):
         if len(v) < 8:
-            raise ValidationError('Password must be at least 8 characters')
+            raise ValueError('Password must be at least 8 characters')
         return v
 
 class UserUpdate(UserBase):

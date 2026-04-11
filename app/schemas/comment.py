@@ -12,7 +12,7 @@ class CommentCreate(BaseModel):
     @classmethod
     def validate_content(cls, value : str) -> str:
         if len(value) < 10:
-            raise ValidationError('Content must be at least 10 characters')
+            raise ValueError('Content must be at least 10 characters')
         return value
 
 class CommentUpdate(BaseModel):
@@ -23,7 +23,6 @@ class CommentResponse(BaseModel):
     content: str
     likes_count: int
     created_at: datetime
-    updated_at: datetime
     author: UserShort
 
     model_config = {"from_attributes": True}

@@ -35,7 +35,7 @@ class PostUpdate(BaseModel):
     title: str | None = None
     content: str | None = None
     is_published: bool | None = None
-    tag_name: list[str] | None = None
+    tag_names: list[str] | None = None
 
 
 class PostResponse(PostBase):
@@ -45,7 +45,7 @@ class PostResponse(PostBase):
     created_at: datetime
 
     author : UserShort
-    tag : list[TagResponse] = []
+    tags : list[TagResponse] = []
 
     model_config = {"from_attributes": True}
 

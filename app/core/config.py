@@ -7,6 +7,7 @@ class Settings(BaseSettings):
 
     # База данных
     DATABASE_URL: str
+    DATABASE_URL_LOCAL: str
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379"
@@ -17,7 +18,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
 
 
 # Создаём один экземпляр на всё приложение
