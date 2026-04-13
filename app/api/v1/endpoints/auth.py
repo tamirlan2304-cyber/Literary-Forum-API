@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+import redis.asyncio as aioredis
 
 import app.crud.user as crud
-from app.core.dependencies import get_db
+from app.core.config import settings
+from app.core.dependencies import get_db, get_redis, get_current_user, bearer_scheme
 from app.core.security import create_access_token
 from app.models import UserORM
 from app.schemas.auth import TokenResponse
@@ -21,6 +23,7 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
     user = await crud.create_user(db, user_data)
     return user
 
+
 @router.post("/login", response_model=TokenResponse)
 async def login(email: str, password: str, db: AsyncSession = Depends(get_db)):
     user = await crud.authenticate_user(db, email, password)
@@ -31,6 +34,22 @@ async def login(email: str, password: str, db: AsyncSession = Depends(get_db)):
         )
     token = create_access_token(subject=str(user.id))
     return TokenResponse(access_token=token)
+
+
+@router.post("/logout", status_code=204)
+async def logout(
+    current_user: UserORM = Depends(get_current_user),
+    redis: aioredis.Redis = Depends(get_redis),
+    credentials = Depends(bearer_scheme) 
+):
+    token = credentials.credentials
+
+    await redis.setex(
+        f"blacklist:{token}",
+        settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        "1"
+    )
+
 
 
 
