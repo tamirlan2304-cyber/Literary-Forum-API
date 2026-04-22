@@ -1,0 +1,53 @@
+import uuid
+
+import app.crud.post as crud
+from fastapi import Depends, HTTPExeption, status, APIRouter, Query
+from app.core.dependencies import get_db, get_current_user
+from app.models import UserORM, PostORM
+from app.schemas import PostCreate, PostResponse, PostUpdate, PostListResponse, PostShort
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
+router = APIRouter()
+
+
+@router.get("", response_model=PostListResponse)
+async def get_list_posts(
+    page: int = Query(default=1, ge=1),
+    size: int = Query(default=20, ge=1, le=100),
+    tag: str | None = Query(default=None),
+    db: AsyncSession = Depends(get_db)
+):
+    posts, total = await crud.get_posts(page, size, tag, db)
+    return PostListResponse(
+        items=[PostShort.model_validate(p) for p in posts],
+        total=total,
+        page=page,
+        size=size
+    )
+
+
+@router.post("", response_model=PostResponse, status_code=201)
+async def create_post(
+    post_data: PostCreate,
+    current_user: UserORM = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    new_post = await crud.create_post(db, post_data, author_id=current_user.id)
+    return new_post
+
+
+@router.get("/{post_id}", response_model=PostResponse)
+async def get_post(
+    post_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db)
+):
+    return await crud.get_post_by_id(db, post_id)
+
+
+
+
+
+    
+
+
